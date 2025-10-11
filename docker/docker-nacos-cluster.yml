@@ -1,4 +1,4 @@
-
+#集群部署nacos,需手动创建配置route
 services:
   nacos-db:
     #mysql版本最兼容的版本就是5.7,其他版本问题特多

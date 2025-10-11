@@ -50,6 +50,9 @@ public class NacosDynamicRouteListener implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         ConfigService configService = nacosConfigManager.getConfigService();
         String routesConfig = configService.getConfig(NACOS_DATA_ID, NACOS_GROUP, 5000);
+        if (routesConfig == null) {
+            throw new RuntimeException("获取Nacos配置失败,没有创建：‘" + NACOS_DATA_ID + "’配置");
+        }
         //序列化成RouteDefinition对象
         JSONObject configJson = JSON.parseObject(routesConfig);
         JSONArray configList = configJson.getJSONArray("data");
