@@ -31,10 +31,10 @@ services:
       - nacos-hostname.env
     ports:
       - "7848:7848"
-      - "8081:8080"
+      - "8080:8080"
       - "8848:8848"
-      - "9868:9848"
-      - "9850:9849"
+      - "9848:9848"
+      - "9849:9849"
     depends_on:
       nacos-db:
         condition: service_healthy

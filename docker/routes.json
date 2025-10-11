@@ -1,0 +1,31 @@
+{
+  "data":[
+    {
+      "enabled":true,
+      "id":"user-service",
+      "uri":"lb://user-service",
+      "predicates":[
+        {
+          "name":"Path",
+          "args":{
+            "pattern":"/api/user/**"
+          }
+        }
+      ],
+      "filters":[
+        {
+          "name":"RequestRateLimiter",
+          "args":{
+            "redis-rate-limiter.replenishRate":1,
+            "redis-rate-limiter.burstCapacity":1,
+            "key-resolver":"#{@ipAddressKeyResolver}"
+          }
+        }
+      ],
+      "metadata":{
+        "date":"2025-10-11"
+      },
+      "order":0
+    }
+  ]
+}
