@@ -1,0 +1,82 @@
+
+services:
+  nacos-db:
+    #mysql版本最兼容的版本就是5.7,其他版本问题特多
+    image: mysql:5.7
+    container_name: nacos-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=nacos_config
+      - MYSQL_USER=nacos
+      - MYSQL_PASSWORD=nacos
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - nacos_net
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+
+  nacos1:
+    image: nacos/nacos-server:latest
+    container_name: nacos1
+    hostname: nacos1
+    env_file:
+      - nacos-hostname.env
+    ports:
+      - "7848:7848"
+      - "8081:8080"
+      - "8848:8848"
+      - "9868:9848"
+      - "9850:9849"
+    depends_on:
+      nacos-db:
+        condition: service_healthy
+    networks:
+      - nacos_net
+
+  nacos2:
+    image: nacos/nacos-server:latest
+    container_name: nacos2
+    hostname: nacos2
+    env_file:
+      - nacos-hostname.env
+    ports:
+      - "7849:7848"
+      - "8082:8080"
+      - "8849:8848"
+      - "9869:9848"
+      - "9851:9849"
+    depends_on:
+      nacos-db:
+        condition: service_healthy
+    networks:
+      - nacos_net
+
+  nacos3:
+    image: nacos/nacos-server:latest
+    container_name: nacos3
+    hostname: nacos3
+    env_file:
+      - nacos-hostname.env
+    ports:
+      - "7850:7848"
+      - "8083:8080"
+      - "8850:8848"
+      - "9870:9848"
+      - "9852:9849"
+    depends_on:
+      nacos-db:
+        condition: service_healthy
+    networks:
+      - nacos_net
+
+networks:
+  nacos_net:
+    driver: bridge
