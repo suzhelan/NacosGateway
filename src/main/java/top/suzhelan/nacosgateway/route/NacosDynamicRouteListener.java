@@ -10,6 +10,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
@@ -21,7 +23,7 @@ import java.util.List;
 @Component
 public class NacosDynamicRouteListener implements InitializingBean {
 
-    public static final String NACOS_DATA_ID = "routes";
+    public static final String NACOS_DATA_ID = "route";
     public static final String NACOS_GROUP = "DEFAULT_GROUP";
     private final DynamicRouteManager dynamicRouteManager;
     private final NacosConfigManager nacosConfigManager;
@@ -51,7 +53,7 @@ public class NacosDynamicRouteListener implements InitializingBean {
         ConfigService configService = nacosConfigManager.getConfigService();
         String routesConfig = configService.getConfig(NACOS_DATA_ID, NACOS_GROUP, 5000);
         if (routesConfig == null) {
-            throw new RuntimeException("获取Nacos配置失败,没有创建：‘" + NACOS_DATA_ID + "’配置");
+            routesConfig = createConfig();
         }
         //序列化成RouteDefinition对象
         JSONObject configJson = JSON.parseObject(routesConfig);
@@ -59,6 +61,25 @@ public class NacosDynamicRouteListener implements InitializingBean {
         List<RouteDefinition> routeDefinitions = configList.toJavaList(RouteDefinition.class);
         dynamicRouteManager.updateList(routeDefinitions);
     }
+
+    private String createConfig() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("route.json")) {
+            if (inputStream == null) {
+                throw new RuntimeException("未找到 resource/route.json 配置文件");
+            }
+            String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            ConfigService configService = nacosConfigManager.getConfigService();
+            if (!configService.publishConfig(NACOS_DATA_ID, NACOS_GROUP, content, "json")) {
+                throw new RuntimeException("创建route时响应nacos失败");
+            }
+            return content;
+        } catch (Exception e) {
+            throw new RuntimeException("自动创建route文件失败", e);
+        }
+    }
+
+
+
 
 
 }
