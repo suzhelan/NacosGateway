@@ -39,8 +39,13 @@ dependencies {
     //负载均衡
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
 
-
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+bootJar {
+    enabled = true
+    archiveFileName = 'NacosGateway.jar'
+    destinationDirectory = file("./libs")
 }
 
 tasks.named('test') {
