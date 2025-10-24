@@ -1,0 +1,17 @@
+name: nacos-gateway
+
+#运行前执行 gradle bootJar
+services:
+  nacos-gateway:
+    image: eclipse-temurin:17-jre-alpine
+    container_name: nacos-gateway
+    env_file:
+      - .env
+    ports:
+      # 根据实际需要配置端口
+      - "8992:8992"
+    #挂载目录
+    volumes:
+      - ./NacosGateway.jar:/NacosGateway.jar
+    #执行启动
+    command: java -jar NacosGateway.jar
