@@ -38,5 +38,3 @@ out/
 
 ## Docker ##
 /docker/data
-
-/libs/*.jar
